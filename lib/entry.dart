@@ -17,6 +17,15 @@ class Entry {
     message = rec['message'];
   }
 
+  @override
+  toString() {
+    return timeStamp.toString().substring(0, 16) +
+        ": " +
+        activities.toString().replaceAll('[', "").replaceAll(']', "") +
+        "\nmessage: " +
+        message + "\n\n";
+  }
+
   Map<String, dynamic> toJson() => {
         'timestamp': timeStamp.toString(),
         'activities': activities,

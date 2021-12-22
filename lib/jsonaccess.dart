@@ -11,13 +11,12 @@ class JsonAccess {
     'Content-Type': 'application/json',
     'secret-key':
         "\$2b\$10\$Tl/Qx8Og4rbm0JqQkxxUY.FnWlWCtXwKscyCUhMcKrtMNqmKXY85m"
-  }; // !!!!!!!!!!!
+  };
 
   Future<List<Entry>> readEntries() async {
     var response = await http.read(Uri.parse(url), headers: h);
     Iterable l = json.decode(response);
     entries = List<Entry>.from(l.map((m) => Entry.fromJson(m)));
-    print(entries);
     return entries;
   }
 

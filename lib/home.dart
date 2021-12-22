@@ -1,9 +1,11 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:math';
 
 import 'package:feedmeapp/jsonaccess.dart';
 import 'package:feedmeapp/newentry.dart';
 import 'package:flutter/material.dart';
-
+import 'package:progress_indicators/progress_indicators.dart';
 import 'entry.dart';
 
 class Home extends StatefulWidget {
@@ -16,6 +18,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final JsonAccess ja = JsonAccess();
   late Future<List<Entry>> futureEntries;
+  final List<int> colorCodes = <int>[500, 400, 300];
 
   @override
   void initState() {
@@ -36,7 +39,13 @@ class _HomeState extends State<Home> {
         future: futureEntries,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return CircularProgressIndicator();
+            return Scaffold(
+                body: Center(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                  JumpingDotsProgressIndicator(fontSize: 40)
+                ])));
           }
           if (snapshot.hasData) {
             return Scaffold(
@@ -53,7 +62,28 @@ class _HomeState extends State<Home> {
                       },
                     ),
                   ]),
-              body: Center(child: Text(snapshot.data.toString())),
+              body: ListView.separated(
+                padding: const EdgeInsets.all(8),
+                itemCount: 3,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(15)),
+                        color: Colors.deepPurple[colorCodes[index]]),
+                    padding: const EdgeInsets.all(8),
+                    height: 65,
+                    child: (Text('${getLastThreeEntries(snapshot.data)[index]}',
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 18))),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) =>
+                    const Divider(
+                  height: 5,
+                  thickness: 10,
+                  color: Colors.transparent,
+                ),
+              ),
               floatingActionButton: FloatingActionButton(
                   backgroundColor: Colors.deepPurple,
                   child: const Icon(Icons.add),
@@ -66,8 +96,13 @@ class _HomeState extends State<Home> {
             );
           }
           return Container(
-            child: Text("please wait while data is being retrieved"),
+            child: const Text("please wait while data is being retrieved"),
           );
         });
   }
+}
+
+getLastThreeEntries(snapshot) {
+  List newList = snapshot.reversed.toList();
+  return newList;
 }
